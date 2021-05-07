@@ -1,12 +1,131 @@
 ## master / unreleased
 
-### **Breaking changes**
-
-### Changes
-
 * [CHANGE]
 * [FEATURE]
 * [ENHANCEMENT]
+* [BUGFIX]
+
+## 1.1.2 / 2021-03-05
+
+* [BUGFIX] Handle errors from disabled PSI subsystem #1983
+* [BUGFIX] Sanitize strings from /sys/class/power_supply #1984
+* [BUGFIX] Silence missing netclass errors #1986
+
+## 1.1.1 / 2021-02-12
+
+* [BUGFIX] Fix ineffassign issue #1957
+* [BUGFIX] Fix some noisy log lines #1962
+
+## 1.1.0 / 2021-02-05
+
+NOTE: We have improved some of the flag naming conventions (PR #1743). The old names are
+      deprecated and will be removed in 2.0. They will continue to work for backwards
+      compatibility.
+
+* [CHANGE] Improve filter flag names #1743
+* [CHANGE] Add btrfs and powersupplyclass to list of exporters enabled by default #1897
+* [FEATURE] Add fibre channel collector #1786
+* [FEATURE] Expose cpu bugs and flags as info metrics. #1788
+* [FEATURE] Add network_route collector #1811
+* [FEATURE] Add zoneinfo collector #1922
+* [ENHANCEMENT] Add more InfiniBand counters #1694
+* [ENHANCEMENT] Add flag to aggr ipvs metrics to avoid high cardinality metrics #1709
+* [ENHANCEMENT] Adding backlog/current queue length to qdisc collector #1732
+* [ENHANCEMENT] Include TCP OutRsts in netstat metrics #1733
+* [ENHANCEMENT] Add pool size to entropy collector #1753
+* [ENHANCEMENT] Remove CGO dependencies for OpenBSD amd64 #1774
+* [ENHANCEMENT] bcache: add writeback_rate_debug stats #1658
+* [ENHANCEMENT] Add check state for mdadm arrays via node_md_state metric #1810
+* [ENHANCEMENT] Expose XFS inode statistics #1870
+* [ENHANCEMENT] Expose zfs zpool state #1878
+* [ENHANCEMENT] Added an ability to pass collector.supervisord.url via SUPERVISORD_URL environment variable #1947
+* [BUGFIX] filesystem_freebsd: Fix label values #1728
+* [BUGFIX] Fix various procfs parsing errors #1735
+* [BUGFIX] Handle no data from powersupplyclass #1747
+* [BUGFIX] udp_queues_linux.go: change upd to udp in two error strings #1769
+* [BUGFIX] Fix node_scrape_collector_success behaviour #1816
+* [BUGFIX] Fix NodeRAIDDegraded to not use a string rule expressions #1827
+* [BUGFIX] Fix node_md_disks state label from fail to failed #1862
+* [BUGFIX] Handle EPERM for syscall in timex collector #1938
+* [BUGFIX] bcache: fix typo in a metric name #1943
+* [BUGFIX] Fix XFS read/write stats (https://github.com/prometheus/procfs/pull/343)
+
+## 1.0.1 / 2020-06-15
+
+* [BUGFIX] filesystem_freebsd: Fix label values #1728
+* [BUGFIX] Update prometheus/procfs to fix log noise #1735
+* [BUGFIX] Fix build tags for collectors #1745
+* [BUGFIX] Handle no data from powersupplyclass #1747, #1749
+
+## 1.0.0 / 2020-05-25
+
+### **Breaking changes**
+
+* The netdev collector CLI argument `--collector.netdev.ignored-devices` was renamed to `--collector.netdev.device-blacklist` in order to conform with the systemd collector. #1279
+* The label named `state` on `node_systemd_service_restart_total` metrics was changed to `name` to better describe the metric. #1393
+* Refactoring of the mdadm collector changes several metrics
+    - `node_md_disks_active` is removed
+    - `node_md_disks` now has a `state` label for "failed", "spare", "active" disks.
+    - `node_md_is_active` is replaced by `node_md_state` with a state set of "active", "inactive", "recovering", "resync".
+* Additional label `mountaddr` added to NFS device metrics to distinguish mounts from the same URL, but different IP addresses. #1417
+* Metrics node_cpu_scaling_frequency_min_hrts and node_cpu_scaling_frequency_max_hrts of the cpufreq collector were renamed to node_cpu_scaling_frequency_min_hertz and node_cpu_scaling_frequency_max_hertz. #1510
+* Collectors that are enabled, but are unable to find data to collect, now return 0 for `node_scrape_collector_success`.
+
+### Changes
+
+* [CHANGE] Add `--collector.netdev.device-whitelist`. #1279
+* [CHANGE] Ignore iso9600 filesystem on Linux #1355
+* [CHANGE] Refactor mdadm collector #1403
+* [CHANGE] Add `mountaddr` label to NFS metrics. #1417
+* [CHANGE] Don't count empty collectors as success. #1613
+* [FEATURE] New flag to disable default collectors #1276
+* [FEATURE] Add experimental TLS support #1277, #1687, #1695
+* [FEATURE] Add collector for Power Supply Class #1280
+* [FEATURE] Add new schedstat collector #1389
+* [FEATURE] Add FreeBSD zfs support #1394
+* [FEATURE] Add uname support for Darwin and OpenBSD #1433
+* [FEATURE] Add new metric node_cpu_info #1489
+* [FEATURE] Add new thermal_zone collector #1425
+* [FEATURE] Add new cooling_device metrics to thermal zone collector #1445
+* [FEATURE] Add swap usage on darwin #1508
+* [FEATURE] Add Btrfs collector #1512
+* [FEATURE] Add RAPL collector #1523
+* [FEATURE] Add new softnet collector #1576
+* [FEATURE] Add new udp_queues collector #1503
+* [FEATURE] Add basic authentication #1673
+* [ENHANCEMENT] Log pid when there is a problem reading the process stats #1341
+* [ENHANCEMENT] Collect InfiniBand port state and physical state #1357
+* [ENHANCEMENT] Include additional XFS runtime statistics. #1423
+* [ENHANCEMENT] Report non-fatal collection errors in the exporter metric. #1439
+* [ENHANCEMENT] Expose IPVS firewall mark as a label #1455
+* [ENHANCEMENT] Add check for systemd version before attempting to query certain metrics. #1413
+* [ENHANCEMENT] Add a flag to adjust mount timeout #1486
+* [ENHANCEMENT] Add new counters for flush requests in Linux 5.5 #1548
+* [ENHANCEMENT] Add metrics and tests for UDP receive and send buffer errors #1534
+* [ENHANCEMENT] The sockstat collector now exposes IPv6 statistics in addition to the existing IPv4 support. #1552
+* [ENHANCEMENT] Add infiniband info metric #1563
+* [ENHANCEMENT] Add unix socket support for supervisord collector #1592
+* [ENHANCEMENT] Implement loadavg on all BSDs without cgo #1584
+* [ENHANCEMENT] Add model_name and stepping to node_cpu_info metric #1617
+* [ENHANCEMENT] Add `--collector.perf.cpus` to allow setting the CPU list for perf stats. #1561
+* [ENHANCEMENT] Add metrics for IO errors and retires on Darwin. #1636
+* [ENHANCEMENT] Add perf tracepoint collection flag #1664
+* [ENHANCEMENT] ZFS: read contents of objset file #1632
+* [ENHANCEMENT] Linux CPU: Cache CPU metrics to make them monotonically increasing #1711
+* [BUGFIX] Read /proc/net files with a single read syscall #1380
+* [BUGFIX] Renamed label `state` to `name` on `node_systemd_service_restart_total`. #1393
+* [BUGFIX] Fix netdev nil reference on Darwin #1414
+* [BUGFIX] Strip path.rootfs from mountpoint labels #1421
+* [BUGFIX] Fix seconds reported by schedstat #1426
+* [BUGFIX] Fix empty string in path.rootfs #1464
+* [BUGFIX] Fix typo in cpufreq metric names #1510
+* [BUGFIX] Read /proc/stat in one syscall #1538
+* [BUGFIX] Fix OpenBSD cache memory information #1542
+* [BUGFIX] Refactor textfile collector to avoid looping defer #1549
+* [BUGFIX] Fix network speed math #1580
+* [BUGFIX] collector/systemd: use regexp to extract systemd version #1647
+* [BUGFIX] Fix initialization in perf collector when using multiple CPUs #1665
+* [BUGFIX] Fix accidentally empty lines in meminfo_linux #1671
 
 ## 0.18.1 / 2019-06-04
 
@@ -65,9 +184,10 @@ Darwin meminfo metrics have been renamed to match Prometheus conventions. #1060
 
 ### Changes
 
+* [CHANGE] Use /proc/mounts instead of statfs(2) for ro state #1002
+* [CHANGE] Exclude only subdirectories of /var/lib/docker #1003
 * [CHANGE] Filter out non-installed units when collecting all systemd units #1011
 * [CHANGE] `service_restart_total` and `socket_refused_connections_total` will not be reported if you're running an older version of systemd
-* [CHANGE] Use /proc/mounts instead of statfs(2) for ro state #1002
 * [CHANGE] collector/timex: remove cgo dependency #1079
 * [CHANGE] filesystem: Ignore Docker netns mounts #1047
 * [CHANGE] Ignore additional virtual filesystems #1104

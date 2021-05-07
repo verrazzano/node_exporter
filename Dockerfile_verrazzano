@@ -1,4 +1,4 @@
-# Copyright (C) 2020, Oracle and/or its affiliates.
+# Copyright (C) 2020, 2021, Oracle and/or its affiliates.
 # Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 
 FROM container-registry.oracle.com/os/oraclelinux:7-slim@sha256:fcc6f54bb01fc83319990bf5fa1b79f1dec93cbb87db3c5a8884a5a44148e7bb AS build_base
@@ -10,12 +10,12 @@ RUN set -eux; \
     yum update -y ; \
     yum-config-manager --save --setopt=ol7_ociyum_config.skip_if_unavailable=true ; \
     yum install -y oracle-golang-release-el7 ; \
-    yum-config-manager --add-repo http://yum.oracle.com/repo/OracleLinux/OL7/developer/golang113/x86_64 ; \
+    yum-config-manager --add-repo http://yum.oracle.com/repo/OracleLinux/OL7/developer/golang115/x86_64 ; \
 	yum install -y \
         git \
         gcc \
         make \
-        golang-1.13.3-1.el7 \
+        golang-1.15.7-1.el7 \
 	; \
     yum clean all ; \
     go version ; \
@@ -37,8 +37,12 @@ FROM build_base AS server_builder
 COPY . .
 RUN go install -a node_exporter.go
 
-
 FROM container-registry.oracle.com/os/oraclelinux:7-slim@sha256:fcc6f54bb01fc83319990bf5fa1b79f1dec93cbb87db3c5a8884a5a44148e7bb AS node_exporter
+RUN yum update -y \
+    && yum-config-manager --save --setopt=ol7_ociyum_config.skip_if_unavailable=true \
+    && yum update -y python glibc  curl openssl \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 COPY --from=server_builder /usr/bin/node_exporter /bin/node_exporter
 
 # Add license files to the image 

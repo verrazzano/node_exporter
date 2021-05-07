@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// +build openbsd,!amd64
 // +build !nodiskstats
 
 package collector
@@ -18,6 +19,7 @@ package collector
 import (
 	"unsafe"
 
+	"github.com/go-kit/kit/log"
 	"github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/sys/unix"
 )
@@ -34,6 +36,7 @@ type diskstatsCollector struct {
 	wxfer  typedDesc
 	wbytes typedDesc
 	time   typedDesc
+	logger log.Logger
 }
 
 func init() {
@@ -41,13 +44,14 @@ func init() {
 }
 
 // NewDiskstatsCollector returns a new Collector exposing disk device stats.
-func NewDiskstatsCollector() (Collector, error) {
+func NewDiskstatsCollector(logger log.Logger) (Collector, error) {
 	return &diskstatsCollector{
 		rxfer:  typedDesc{readsCompletedDesc, prometheus.CounterValue},
 		rbytes: typedDesc{readBytesDesc, prometheus.CounterValue},
 		wxfer:  typedDesc{writesCompletedDesc, prometheus.CounterValue},
 		wbytes: typedDesc{writtenBytesDesc, prometheus.CounterValue},
 		time:   typedDesc{ioTimeSecondsDesc, prometheus.CounterValue},
+		logger: logger,
 	}, nil
 }
 

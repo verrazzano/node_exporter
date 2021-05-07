@@ -16,10 +16,14 @@
 package collector
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"syscall"
 
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/common/log"
 	"github.com/prometheus/procfs"
 )
 
@@ -35,6 +39,8 @@ type pressureStatsCollector struct {
 	memFull *prometheus.Desc
 
 	fs procfs.FS
+
+	logger log.Logger
 }
 
 func init() {
@@ -42,10 +48,10 @@ func init() {
 }
 
 // NewPressureStatsCollector returns a Collector exposing pressure stall information
-func NewPressureStatsCollector() (Collector, error) {
+func NewPressureStatsCollector(logger log.Logger) (Collector, error) {
 	fs, err := procfs.NewFS(*procPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open procfs: %v", err)
+		return nil, fmt.Errorf("failed to open procfs: %w", err)
 	}
 
 	return &pressureStatsCollector{
@@ -74,18 +80,26 @@ func NewPressureStatsCollector() (Collector, error) {
 			"Total time in seconds no process could make progress due to memory congestion",
 			nil, nil,
 		),
-		fs: fs,
+		fs:     fs,
+		logger: logger,
 	}, nil
 }
 
 // Update calls procfs.NewPSIStatsForResource for the different resources and updates the values
 func (c *pressureStatsCollector) Update(ch chan<- prometheus.Metric) error {
 	for _, res := range psiResources {
-		log.Debugf("collecting statistics for resource: %s", res)
-		vals, err := c.fs.NewPSIStatsForResource(res)
+		level.Debug(c.logger).Log("msg", "collecting statistics for resource", "resource", res)
+		vals, err := c.fs.PSIStatsForResource(res)
 		if err != nil {
-			log.Debug("pressure information is unavailable, you need a Linux kernel >= 4.20 and/or CONFIG_PSI enabled for your kernel")
-			return nil
+			if errors.Is(err, os.ErrNotExist) {
+				level.Debug(c.logger).Log("msg", "pressure information is unavailable, you need a Linux kernel >= 4.20 and/or CONFIG_PSI enabled for your kernel")
+				return ErrNoData
+			}
+			if errors.Is(err, syscall.ENOTSUP) {
+				level.Debug(c.logger).Log("msg", "pressure information is disabled, add psi=1 kernel command line to enable it")
+				return ErrNoData
+			}
+			return fmt.Errorf("failed to retrieve pressure stats: %w", err)
 		}
 		switch res {
 		case "cpu":
@@ -97,7 +111,7 @@ func (c *pressureStatsCollector) Update(ch chan<- prometheus.Metric) error {
 			ch <- prometheus.MustNewConstMetric(c.mem, prometheus.CounterValue, float64(vals.Some.Total)/1000.0/1000.0)
 			ch <- prometheus.MustNewConstMetric(c.memFull, prometheus.CounterValue, float64(vals.Full.Total)/1000.0/1000.0)
 		default:
-			log.Debugf("did not account for resource: %s", res)
+			level.Debug(c.logger).Log("msg", "did not account for resource", "resource", res)
 		}
 	}
 

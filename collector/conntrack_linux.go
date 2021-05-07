@@ -16,12 +16,19 @@
 package collector
 
 import (
+	"errors"
+	"fmt"
+	"os"
+
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 type conntrackCollector struct {
 	current *prometheus.Desc
 	limit   *prometheus.Desc
+	logger  log.Logger
 }
 
 func init() {
@@ -29,7 +36,7 @@ func init() {
 }
 
 // NewConntrackCollector returns a new Collector exposing conntrack stats.
-func NewConntrackCollector() (Collector, error) {
+func NewConntrackCollector(logger log.Logger) (Collector, error) {
 	return &conntrackCollector{
 		current: prometheus.NewDesc(
 			prometheus.BuildFQName(namespace, "", "nf_conntrack_entries"),
@@ -41,24 +48,32 @@ func NewConntrackCollector() (Collector, error) {
 			"Maximum size of connection tracking table.",
 			nil, nil,
 		),
+		logger: logger,
 	}, nil
 }
 
 func (c *conntrackCollector) Update(ch chan<- prometheus.Metric) error {
 	value, err := readUintFromFile(procFilePath("sys/net/netfilter/nf_conntrack_count"))
 	if err != nil {
-		// Conntrack probably not loaded into the kernel.
-		return nil
+		return c.handleErr(err)
 	}
 	ch <- prometheus.MustNewConstMetric(
 		c.current, prometheus.GaugeValue, float64(value))
 
 	value, err = readUintFromFile(procFilePath("sys/net/netfilter/nf_conntrack_max"))
 	if err != nil {
-		return nil
+		return c.handleErr(err)
 	}
 	ch <- prometheus.MustNewConstMetric(
 		c.limit, prometheus.GaugeValue, float64(value))
 
 	return nil
+}
+
+func (c *conntrackCollector) handleErr(err error) error {
+	if errors.Is(err, os.ErrNotExist) {
+		level.Debug(c.logger).Log("msg", "conntrack probably not loaded")
+		return ErrNoData
+	}
+	return fmt.Errorf("failed to retrieve conntrack stats: %w", err)
 }

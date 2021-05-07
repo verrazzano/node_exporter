@@ -1,14 +1,16 @@
 github.com/prometheus/node_exporter
 -------- Copyrights
-# Copyright 2015 The Prometheus Authors
-# Copyright 2018 The Prometheus Authors
+Copyright 2015 The Prometheus Authors
+Copyright 2018 The Prometheus Authors
 Copyright 2013-2015 The Prometheus Authors
 Copyright 2016-2017 Matt Layher
-// Copyright 2017 The Prometheus Authors
-// Copyright 2015 The Prometheus Authors
-// Copyright 2018 The Prometheus Authors
-// Copyright 2016 The Prometheus Authors
-// Copyright 2019 The Prometheus Authors
+Copyright 2017 The Prometheus Authors
+Copyright 2020 The Prometheus Authors
+Copyright 2019 The Prometheus Authors
+Copyright 2016 The Prometheus Authors
+Copyright 2021 The Prometheus Authors
+Copyright 2017-2019 The Prometheus Authors
+Copyright 2020 The prometheus Authors
 -------- Notices
 Configurable modular Prometheus exporter for various node metrics.
 Copyright 2013-2015 The Prometheus Authors
@@ -29,7 +31,7 @@ Copyright 2016-2017 Matt Layher
 Licensed under the MIT License
 
 
-======== License
+-------- License
 SPDX:Apache-2.0
                                  Apache License
                            Version 2.0, January 2004
@@ -206,16 +208,16 @@ SPDX:Apache-2.0
       incurred by, or claims asserted against, such Contributor by reason
       of your accepting any such warranty or additional liability.
 
-======================= Dependencies Grouped by License ============
+----------------------- Dependencies Grouped by License ------------
 -------- Dependency
 github.com/lufia/iostat
 -------- Copyrights
 Copyright (c) 2017, kadota kyohei
 
-======== Dependencies Summary
+-------- Dependencies Summary
 github.com/lufia/iostat
 
-======== License used by Dependencies
+-------- License used by Dependencies
 BSD 3-Clause License
 
 Copyright (c) 2017, kadota kyohei
@@ -247,129 +249,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-======================= Dependencies Grouped by License ============
--------- Dependency
-github.com/julienschmidt/httprouter
--------- Copyrights
-Copyright (c) 2013 Julien Schmidt. All rights reserved.
-// Copyright 2013 Julien Schmidt. All rights reserved.
-// Based on the path package, Copyright 2009 The Go Authors.
-
-======== Dependencies Summary
-github.com/julienschmidt/httprouter
-
-======== License used by Dependencies
-Copyright (c) 2013 Julien Schmidt. All rights reserved.
-
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-    * The names of the contributors may not be used to endorse or promote
-      products derived from this software without specific prior written
-      permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL JULIEN SCHMIDT BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-======================= Dependencies Grouped by License ============
--------- Dependency
-github.com/godbus/dbus
--------- Copyrights
-Copyright (c) 2013, Georg Reinke (<guelfey at gmail dot com>), Google
-
-======== Dependencies Summary
-github.com/godbus/dbus
-
-======== License used by Dependencies
-Copyright (c) 2013, Georg Reinke (<guelfey at gmail dot com>), Google
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
-
-1. Redistributions of source code must retain the above copyright notice,
-this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
-TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
-======================= Dependencies Grouped by License ============
--------- Dependency
-github.com/pmezard/go-difflib
--------- Copyrights
-Copyright (c) 2013, Patrick Mezard
-
-======== Dependencies Summary
-github.com/pmezard/go-difflib
-
-======== License used by Dependencies
-Copyright (c) 2013, Patrick Mezard
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-    Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-    Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution.
-    The names of its contributors may not be used to endorse or promote
-products derived from this software without specific prior written
-permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
-IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
-TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
-TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
-======================= Dependencies Grouped by License ============
+----------------------- Dependencies Grouped by License ------------
 -------- Dependency
 github.com/pkg/errors
 -------- Copyrights
 Copyright (c) 2015, Dave Cheney <dave@cheney.net>
 
-======== Dependencies Summary
+-------- Dependencies Summary
 github.com/pkg/errors
 
-======== License used by Dependencies
+-------- License used by Dependencies
 Copyright (c) 2015, Dave Cheney <dave@cheney.net>
 All rights reserved.
 
@@ -395,17 +284,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-======================= Dependencies Grouped by License ============
+----------------------- Dependencies Grouped by License ------------
 -------- Dependency
 github.com/beevik/ntp
 -------- Copyrights
 Copyright 2015-2017 Brett Vickers. All rights reserved.
-// Copyright 2015-2017 Brett Vickers.
+Copyright 2015-2017 Brett Vickers.
 
-======== Dependencies Summary
+-------- Dependencies Summary
 github.com/beevik/ntp
 
-======== License used by Dependencies
+-------- License used by Dependencies
 Copyright 2015-2017 Brett Vickers. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -432,33 +321,13 @@ OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-======================= Dependencies Grouped by License ============
--------- Dependency
-github.com/coreos/go-systemd
--------- Copyrights
-Copyright 2018 CoreOS, Inc
-// Copyright 2018 CoreOS, Inc.
-// Copyright 2015 CoreOS, Inc.
-// Copyright 2014 Docker, Inc.
-// Copyright 2015-2018 CoreOS, Inc.
-// Copyright 2016 CoreOS, Inc.
-// Copyright 2015, 2018 CoreOS, Inc.
-Copyright 2015 CoreOS Inc.
-// Copyright 2015 RedHat, Inc.
--------- Notices
-CoreOS Project
-Copyright 2018 CoreOS, Inc
-
-This product includes software developed at CoreOS, Inc.
-(http://www.coreos.com/).
-
-
+----------------------- Dependencies Grouped by License ------------
 -------- Dependency
 github.com/matttproud/golang_protobuf_extensions
 -------- Copyrights
 Copyright 2012 Matt T. Proud (matt.proud@gmail.com)
-// Copyright 2013 Matt T. Proud
-// Copyright 2016 Matt T. Proud
+Copyright 2013 Matt T. Proud
+Copyright 2016 Matt T. Proud
 -------- Notices
 Copyright 2012 Matt T. Proud (matt.proud@gmail.com)
 
@@ -466,22 +335,23 @@ Copyright 2012 Matt T. Proud (matt.proud@gmail.com)
 -------- Dependency
 github.com/mwitkow/go-conntrack
 -------- Copyrights
-// Copyright 2016 Michal Witkowski. All Rights Reserved.
+Copyright 2016 Michal Witkowski. All Rights Reserved.
 
 -------- Dependency
 github.com/prometheus/client_golang
 -------- Copyrights
-# Copyright 2018 The Prometheus Authors
+Copyright 2018 The Prometheus Authors
 Copyright 2012-2015 The Prometheus Authors
 Copyright 2013-2015 Blake Mizerany, Björn Rabenstein
 Copyright 2010 The Go Authors
 Copyright 2013 Matt T. Proud
-// Copyright 2015 The Prometheus Authors
-// Copyright 2017 The Prometheus Authors
-// Copyright 2014 The Prometheus Authors
-// Copyright 2018 The Prometheus Authors
-// Copyright 2016 The Prometheus Authors
-// Copyright (c) 2013, The Prometheus Authors
+Copyright 2015 The Prometheus Authors
+Copyright 2017 The Prometheus Authors
+Copyright 2019 The Prometheus Authors
+Copyright 2014 The Prometheus Authors
+Copyright 2016 The Prometheus Authors
+Copyright 2020 The Prometheus Authors
+Copyright (c) 2013, The Prometheus Authors
 -------- Notices
 Prometheus instrumentation library for Go applications
 Copyright 2012-2015 The Prometheus Authors
@@ -511,7 +381,7 @@ Licensed under the Apache License, Version 2.0
 -------- Dependency
 github.com/prometheus/client_model
 -------- Copyrights
-# Copyright 2013 Prometheus Team
+Copyright 2013 Prometheus Team
 Copyright 2012-2015 The Prometheus Authors
 -------- Notices
 Data model artifacts for Prometheus.
@@ -524,16 +394,15 @@ SoundCloud Ltd. (http://soundcloud.com/).
 -------- Dependency
 github.com/prometheus/common
 -------- Copyrights
-# Copyright 2018 The Prometheus Authors
+Copyright 2018 The Prometheus Authors
 Copyright 2015 The Prometheus Authors
-// Copyright 2016 The Prometheus Authors
-// Copyright 2015 The Prometheus Authors
-// Copyright 2018 The Prometheus Authors
-// Copyright 2014 The Prometheus Authors
+Copyright 2016 The Prometheus Authors
+Copyright 2014 The Prometheus Authors
+Copyright 2020 The Prometheus Authors
 Copyright (c) 2011, Open Knowledge Foundation Ltd.
-// Copyright 2013 The Prometheus Authors
-// Copyright 2019 The Prometheus Authors
-// Copyright 2017 The Prometheus Authors
+Copyright 2013 The Prometheus Authors
+Copyright 2019 The Prometheus Authors
+Copyright 2017 The Prometheus Authors
 -------- Notices
 Common libraries shared by Prometheus Go components.
 Copyright 2015 The Prometheus Authors
@@ -543,15 +412,24 @@ SoundCloud Ltd. (http://soundcloud.com/).
 
 
 -------- Dependency
+github.com/prometheus/exporter-toolkit
+-------- Copyrights
+Copyright 2020 The Prometheus Authors
+Copyright 2018 The Prometheus Authors
+Copyright 2021 The Prometheus Authors
+Copyright 2015 Matthew Holt and The Caddy Authors
+Copyright 2019 The Prometheus Authors
+
+-------- Dependency
 github.com/prometheus/procfs
 -------- Copyrights
-# Copyright 2018 The Prometheus Authors
+Copyright 2018 The Prometheus Authors
 Copyright 2014-2015 The Prometheus Authors
-// Copyright 2017 The Prometheus Authors
-// Copyright 2018 The Prometheus Authors
-// Copyright 2014 Prometheus Team
-// Copyright 2019 The Prometheus Authors
-// Copyright 2017 Prometheus Team
+Copyright 2019 The Prometheus Authors
+Copyright 2017 The Prometheus Authors
+Copyright 2020 The Prometheus Authors
+Copyright 2014 Prometheus Team
+Copyright 2017 Prometheus Team
 -------- Notices
 procfs provides functions to retrieve system, kernel and process
 metrics from the pseudo-filesystem proc.
@@ -583,17 +461,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 
-======== Dependencies Summary
-github.com/coreos/go-systemd
+-------- Dependencies Summary
 github.com/matttproud/golang_protobuf_extensions
 github.com/mwitkow/go-conntrack
 github.com/prometheus/client_golang
 github.com/prometheus/client_model
 github.com/prometheus/common
+github.com/prometheus/exporter-toolkit
 github.com/prometheus/procfs
 gopkg.in/yaml.v2
 
-======== License used by Dependencies
+-------- License used by Dependencies
 SPDX:Apache-2.0
                                  Apache License
                            Version 2.0, January 2004
@@ -770,81 +648,45 @@ SPDX:Apache-2.0
       incurred by, or claims asserted against, such Contributor by reason
       of your accepting any such warranty or additional liability.
 
-======================= Dependencies Grouped by License ============
+----------------------- Dependencies Grouped by License ------------
 -------- Dependency
 github.com/alecthomas/template
 -------- Copyrights
 Copyright (c) 2012 The Go Authors. All rights reserved.
-// Copyright 2011 The Go Authors. All rights reserved.
-// Copyright 2012 The Go Authors. All rights reserved.
-
--------- Dependency
-github.com/gogo/protobuf
--------- Copyrights
-Copyright (c) 2013, The GoGo Authors. All rights reserved.
-Copyright 2010 The Go Authors.  All rights reserved.
-# Copyright (c) 2013, The GoGo Authors. All rights reserved.
-Copyright 2010 The Go Authors.
-// Copyright (c) 2015, The GoGo Authors. All rights reserved.
-# Copyright 2016 The Go Authors.  All rights reserved.
-// Copyright 2016 The Go Authors.  All rights reserved.
-// Copyright (c) 2013, The GoGo Authors. All rights reserved.
-// Copyright 2015 The Go Authors.  All rights reserved.
-# Copyright 2015 The Go Authors.  All rights reserved.
-# Copyright 2010 The Go Authors.  All rights reserved.
-// Copyright 2010 The Go Authors.  All rights reserved.
-// Copyright 2011 The Go Authors.  All rights reserved.
-// Copyright (c) 2018, The GoGo Authors. All rights reserved.
-// Copyright 2017 The Go Authors.  All rights reserved.
-// Copyright (c) 2016, The GoGo Authors. All rights reserved.
-// Copyright 2014 The Go Authors.  All rights reserved.
-// Copyright 2012 The Go Authors.  All rights reserved.
-// Copyright 2013 The Go Authors.  All rights reserved.
-# Copyright (c) 2018, The GoGo Authors. All rights reserved.
-# Copyright (c) 2015, The GoGo Authors. All rights reserved.
-# Copyright (c) 2016, The GoGo Authors. All rights reserved.
-# Copyright (c) 2017, The GoGo Authors. All rights reserved.
-// Copyright (c) 2017, The GoGo Authors. All rights reserved.
-// Copyright (c) 2015, The GoGo Authors.  rights reserved.
+Copyright 2011 The Go Authors. All rights reserved.
+Copyright 2012 The Go Authors. All rights reserved.
 
 -------- Dependency
 github.com/golang/protobuf
 -------- Copyrights
 Copyright 2010 The Go Authors.  All rights reserved.
-# Copyright 2010 The Go Authors.  All rights reserved.
-Copyright 2010 The Go Authors.
-// Copyright 2016 The Go Authors.  All rights reserved.
-// Copyright 2015 The Go Authors.  All rights reserved.
-// Copyright 2010 The Go Authors.  All rights reserved.
-// Copyright 2011 The Go Authors.  All rights reserved.
-// Copyright 2018 The Go Authors.  All rights reserved.
-// Copyright 2017 The Go Authors.  All rights reserved.
-// Copyright 2014 The Go Authors.  All rights reserved.
-// Copyright 2012 The Go Authors.  All rights reserved.
-// Copyright 2013 The Go Authors.  All rights reserved.
-
--------- Dependency
-github.com/google/go-cmp
--------- Copyrights
-Copyright (c) 2017 The Go Authors. All rights reserved.
-// Copyright 2017, The Go Authors. All rights reserved.
-// Copyright 2018, The Go Authors. All rights reserved.
-// Copyright 2019, The Go Authors. All rights reserved.
+Copyright 2016 The Go Authors. All rights reserved.
+Copyright 2020 The Go Authors. All rights reserved.
+Copyright 2019 The Go Authors. All rights reserved.
+Copyright 2018 The Go Authors. All rights reserved.
+Copyright 2015 The Go Authors. All rights reserved.
+Copyright 2017 The Go Authors. All rights reserved.
+Copyright 2010 The Go Authors. All rights reserved.
+Copyright 2014 The Go Authors. All rights reserved.
+Copyright 2011 The Go Authors. All rights reserved.
+Copyright 2015 The Go Authors.  All rights reserved.
 
 -------- Dependency
 golang.org/x/crypto
 -------- Copyrights
 Copyright (c) 2009 The Go Authors. All rights reserved.
-// Copyright 2015 The Go Authors. All rights reserved.
-// Copyright 2016 The Go Authors. All rights reserved.
-// Copyright 2017 The Go Authors. All rights reserved.
-// Copyright 2018 The Go Authors. All rights reserved.
-// Copyright 2011 The Go Authors. All rights reserved.
-// Copyright 2010 The Go Authors. All rights reserved.
-// Copyright 2012 The Go Authors. All rights reserved.
-// Copyright 2013 The Go Authors. All rights reserved.
-// Copyright 2014 The Go Authors. All rights reserved.
-// Copyright 2009 The Go Authors. All rights reserved.
+Copyright 2015 The Go Authors. All rights reserved.
+Copyright 2016 The Go Authors. All rights reserved.
+Copyright 2017 The Go Authors. All rights reserved.
+Copyright 2018 The Go Authors. All rights reserved.
+Copyright 2019 The Go Authors. All rights reserved.
+Copyright 2011 The Go Authors. All rights reserved.
+Copyright 2010 The Go Authors. All rights reserved.
+Copyright 2012 The Go Authors. All rights reserved.
+Copyright 2013 The Go Authors. All rights reserved.
+Copyright 2014 The Go Authors. All rights reserved.
+Copyright 2020 The Go Authors. All rights reserved.
+Copyright 2009 The Go Authors. All rights reserved.
 -------- Patents
 Additional IP Rights Grant (Patents)
 
@@ -874,50 +716,19 @@ shall terminate as of the date such litigation is filed.
 golang.org/x/net
 -------- Copyrights
 Copyright (c) 2009 The Go Authors. All rights reserved.
-// Copyright 2016 The Go Authors. All rights reserved.
-// Copyright 2017 The Go Authors. All rights reserved.
-// Copyright 2014 The Go Authors. All rights reserved.
-// Copyright 2015 The Go Authors. All rights reserved.
-// Copyright 2010 The Go Authors. All rights reserved.
-// Copyright 2009 The Go Authors. All rights reserved.
-// Copyright 2012 The Go Authors. All rights reserved.
-// Copyright 2013 The Go Authors. All rights reserved.
-// Copyright 2011 The Go Authors. All rights reserved.
+Copyright 2016 The Go Authors. All rights reserved.
+Copyright 2017 The Go Authors. All rights reserved.
+Copyright 2014 The Go Authors. All rights reserved.
+Copyright 2015 The Go Authors. All rights reserved.
+Copyright 2010 The Go Authors. All rights reserved.
+Copyright 2009 The Go Authors. All rights reserved.
+Copyright 2012 The Go Authors. All rights reserved.
+Copyright 2013 The Go Authors. All rights reserved.
+Copyright 2011 The Go Authors. All rights reserved.
 Copyright (C) 2009 Apple Inc. All rights reserved.
-// Copyright 2018 The Go Authors. All rights reserved.
-// Copyright 2019 The Go Authors. All rights reserved.
--------- Patents
-Additional IP Rights Grant (Patents)
-
-"This implementation" means the copyrightable works distributed by
-Google as part of the Go project.
-
-Google hereby grants to You a perpetual, worldwide, non-exclusive,
-no-charge, royalty-free, irrevocable (except as stated in this section)
-patent license to make, have made, use, offer to sell, sell, import,
-transfer and otherwise run, modify and propagate the contents of this
-implementation of Go, where such license applies only to those patent
-claims, both currently owned or controlled by Google and acquired in
-the future, licensable by Google that are necessarily infringed by this
-implementation of Go.  This grant does not include claims that would be
-infringed only as a consequence of further modification of this
-implementation.  If you or your agent or exclusive licensee institute or
-order or agree to the institution of patent litigation against any
-entity (including a cross-claim or counterclaim in a lawsuit) alleging
-that this implementation of Go or any code incorporated within this
-implementation of Go constitutes direct or contributory patent
-infringement, or inducement of patent infringement, then any patent
-rights granted to you under this License for this implementation of Go
-shall terminate as of the date such litigation is filed.
-
-
--------- Dependency
-golang.org/x/sync
--------- Copyrights
-Copyright (c) 2009 The Go Authors. All rights reserved.
-// Copyright 2016 The Go Authors. All rights reserved.
-// Copyright 2017 The Go Authors. All rights reserved.
-// Copyright 2013 The Go Authors. All rights reserved.
+Copyright 2018 The Go Authors. All rights reserved.
+Copyright 2020 The Go Authors. All rights reserved.
+Copyright 2019 The Go Authors. All rights reserved.
 -------- Patents
 Additional IP Rights Grant (Patents)
 
@@ -947,19 +758,20 @@ shall terminate as of the date such litigation is filed.
 golang.org/x/sys
 -------- Copyrights
 Copyright (c) 2009 The Go Authors. All rights reserved.
-// Copyright 2019 The Go Authors. All rights reserved.
-// Copyright 2018 The Go Authors. All rights reserved.
-// Copyright 2012 The Go Authors. All rights reserved.
-// Copyright 2011 The Go Authors. All rights reserved.
-// Copyright 2015 The Go Authors. All rights reserved.
-// Copyright 2009 The Go Authors. All rights reserved.
-// Copyright 2013 The Go Authors. All rights reserved.
-// Copyright 2016 The Go Authors. All rights reserved.
-// Copyright 2017 The Go Authors. All rights reserved.
-// Copyright 2010 The Go Authors. All rights reserved.
-// Copyright 2014 The Go Authors. All rights reserved.
-// Copyright 2009,2010 The Go Authors. All rights reserved.
-// Copyright 2017 The Go Authors. All right reserved.
+Copyright 2019 The Go Authors. All rights reserved.
+Copyright 2018 The Go Authors. All rights reserved.
+Copyright 2020 The Go Authors. All rights reserved.
+Copyright 2012 The Go Authors. All rights reserved.
+Copyright 2011 The Go Authors. All rights reserved.
+Copyright 2015 The Go Authors. All rights reserved.
+Copyright 2009 The Go Authors. All rights reserved.
+Copyright 2013 The Go Authors. All rights reserved.
+Copyright 2016 The Go Authors. All rights reserved.
+Copyright 2017 The Go Authors. All rights reserved.
+Copyright 2010 The Go Authors. All rights reserved.
+Copyright 2014 The Go Authors. All rights reserved.
+Copyright 2009,2010 The Go Authors. All rights reserved.
+Copyright 2017 The Go Authors. All right reserved.
 -------- Patents
 Additional IP Rights Grant (Patents)
 
@@ -989,15 +801,16 @@ shall terminate as of the date such litigation is filed.
 golang.org/x/text
 -------- Copyrights
 Copyright (c) 2009 The Go Authors. All rights reserved.
-// Copyright 2014 The Go Authors. All rights reserved.
-// Copyright 2016 The Go Authors. All rights reserved.
-// Copyright 2015 The Go Authors. All rights reserved.
-// Copyright 2017 The Go Authors. All rights reserved.
-// Copyright 2012 The Go Authors. All rights reserved.
-// Copyright 2013 The Go Authors. All rights reserved.
-# Copyright 2012 The Go Authors. All rights reserved.
-# Copyright 2013 The Go Authors. All rights reserved.
-// Copyright 2011 The Go Authors. All rights reserved.
+Copyright 2014 The Go Authors. All rights reserved.
+Copyright 2016 The Go Authors. All rights reserved.
+Copyright 2015 The Go Authors. All rights reserved.
+Copyright 2017 The Go Authors. All rights reserved.
+Copyright 2012 The Go Authors. All rights reserved.
+Copyright 2013 The Go Authors. All rights reserved.
+Copyright 2018 The Go Authors. All rights reserved.
+Copyright 2009 The Go Authors. All rights reserved.
+Copyright 2019 The Go Authors. All rights reserved.
+Copyright 2011 The Go Authors. All rights reserved.
 -------- Patents
 Additional IP Rights Grant (Patents)
 
@@ -1023,18 +836,51 @@ rights granted to you under this License for this implementation of Go
 shall terminate as of the date such litigation is filed.
 
 
-======== Dependencies Summary
+-------- Dependency
+google.golang.org/protobuf
+-------- Copyrights
+Copyright (c) 2018 The Go Authors. All rights reserved.
+Copyright 2018 The Go Authors. All rights reserved.
+Copyright 2019 The Go Authors. All rights reserved.
+Copyright 2020 The Go Authors. All rights reserved.
+Copyright 2019 The Go Authors. All rights reserved.",
+Copyright 2018 The Go Authors. All rights reserved.",
+Copyright 2008 Google Inc.  All rights reserved.
+-------- Patents
+Additional IP Rights Grant (Patents)
+
+"This implementation" means the copyrightable works distributed by
+Google as part of the Go project.
+
+Google hereby grants to You a perpetual, worldwide, non-exclusive,
+no-charge, royalty-free, irrevocable (except as stated in this section)
+patent license to make, have made, use, offer to sell, sell, import,
+transfer and otherwise run, modify and propagate the contents of this
+implementation of Go, where such license applies only to those patent
+claims, both currently owned or controlled by Google and acquired in
+the future, licensable by Google that are necessarily infringed by this
+implementation of Go.  This grant does not include claims that would be
+infringed only as a consequence of further modification of this
+implementation.  If you or your agent or exclusive licensee institute or
+order or agree to the institution of patent litigation against any
+entity (including a cross-claim or counterclaim in a lawsuit) alleging
+that this implementation of Go or any code incorporated within this
+implementation of Go constitutes direct or contributory patent
+infringement, or inducement of patent infringement, then any patent
+rights granted to you under this License for this implementation of Go
+shall terminate as of the date such litigation is filed.
+
+
+-------- Dependencies Summary
 github.com/alecthomas/template
-github.com/gogo/protobuf
 github.com/golang/protobuf
-github.com/google/go-cmp
 golang.org/x/crypto
 golang.org/x/net
-golang.org/x/sync
 golang.org/x/sys
 golang.org/x/text
+google.golang.org/protobuf
 
-======== License used by Dependencies
+-------- License used by Dependencies
 SPDX:BSD-3-Clause--modified-by-Google
 Redistribution and use in source and binary forms, with 
 or without modification, are permitted provided that the following conditions
@@ -1062,34 +908,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-======================= Dependencies Grouped by License ============
--------- Dependency
-github.com/davecgh/go-spew
--------- Copyrights
-Copyright (c) 2012-2016 Dave Collins <dave@davec.name>
-// Copyright (c) 2015-2016 Dave Collins <dave@davec.name>
- * Copyright (c) 2013-2016 Dave Collins <dave@davec.name>
-// Copyright (c) 2013-2016 Dave Collins <dave@davec.name>
-// Copyright (c) 2013 Dave Collins <dave@davec.name>
-
-======== Dependencies Summary
-github.com/davecgh/go-spew
-
-======== License used by Dependencies
-SPDX:ISC
-Permission to use, copy, modify, and/or distribute this 
-software for any purpose with or without fee is hereby granted, provided that 
-the above copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH 
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY 
-AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, 
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM 
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR 
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR 
-PERFORMANCE OF THIS SOFTWARE.
-
-======================= Dependencies Grouped by License ============
+----------------------- Dependencies Grouped by License ------------
 -------- Dependency
 github.com/alecthomas/units
 -------- Copyrights
@@ -1101,40 +920,28 @@ github.com/beorn7/perks
 Copyright (C) 2013 Blake Mizerany
 
 -------- Dependency
-github.com/ema/qdisc
+github.com/cespare/xxhash/v2
 -------- Copyrights
-Copyright (C) 2017 Emanuele Rocca
+Copyright (c) 2016 Caleb Spare
 
 -------- Dependency
 github.com/go-kit/kit
 -------- Copyrights
 Copyright (c) 2015 Peter Bourgon
 Copyright (c) 2014 Simon Eskildsen
-// Copyright 2013 The Go Authors. All rights reserved.
-// Copyright 2011 The Go Authors. All rights reserved.
+Copyright 2013 The Go Authors. All rights reserved.
+Copyright 2011 The Go Authors. All rights reserved.
 
 -------- Dependency
 github.com/go-logfmt/logfmt
 -------- Copyrights
 Copyright (c) 2015 go-logfmt
-// Copyright 2010 The Go Authors. All rights reserved.
+Copyright 2010 The Go Authors. All rights reserved.
 
 -------- Dependency
-github.com/hodgesds/perf-utils
+github.com/jpillora/backoff
 -------- Copyrights
-Copyright (c) 2019 Daniel Hodges
-
--------- Dependency
-github.com/konsorten/go-windows-terminal-sequences
--------- Copyrights
-Copyright (c) 2017 marvin + konsorten GmbH (open-source@konsorten.de)
-Copyright (c) 2018 marvin + konsorten GmbH (open-source@konsorten.de)
-
--------- Dependency
-github.com/kr/logfmt
--------- Copyrights
-Copyright (C) 2013 Keith Rarick, Blake Mizerany
-// Copyright 2010 The Go Authors. All rights reserved.
+Copyright (c) 2017 Jaime Pillora
 
 -------- Dependency
 github.com/mattn/go-xmlrpc
@@ -1142,82 +949,27 @@ github.com/mattn/go-xmlrpc
 Copyright (c) 2017 Yasuhiro Matsumoto
 
 -------- Dependency
-github.com/mdlayher/genetlink
--------- Copyrights
-Copyright (C) 2016-2017 Matt Layher
-
--------- Dependency
-github.com/mdlayher/netlink
--------- Copyrights
-Copyright (C) 2016-2017 Matt Layher
-// Copyright 2014 The Go Authors. All rights reserved.
-
--------- Dependency
-github.com/mdlayher/wifi
--------- Copyrights
-Copyright (C) 2016 Matt Layher
-
--------- Dependency
-github.com/sirupsen/logrus
--------- Copyrights
-Copyright (c) 2014 Simon Eskildsen
-// Copyright (c) 2012 Miki Tebeka <miki.tebeka@gmail.com>.
-
--------- Dependency
 github.com/soundcloud/go-runit
 -------- Copyrights
 Copyright (c) 2015 SoundCloud Ltd.
-
--------- Dependency
-github.com/stretchr/objx
--------- Copyrights
-Copyright (c) 2014 Stretchr, Inc.
-Copyright (c) 2017-2018 objx contributors
-
--------- Dependency
-github.com/stretchr/testify
--------- Copyrights
-Copyright (c) 2012-2018 Mat Ryer and Tyler Bunnell
-
--------- Dependency
-go.uber.org/atomic
--------- Copyrights
-Copyright (c) 2016 Uber Technologies, Inc.
-// Copyright (c) 2016 Uber Technologies, Inc.
-
--------- Dependency
-go.uber.org/multierr
--------- Copyrights
-Copyright (c) 2017 Uber Technologies, Inc.
-// Copyright (c) 2017 Uber Technologies, Inc.
 
 -------- Dependency
 gopkg.in/alecthomas/kingpin.v2
 -------- Copyrights
 Copyright (C) 2014 Alec Thomas
 
-======== Dependencies Summary
+-------- Dependencies Summary
 github.com/alecthomas/units
 github.com/beorn7/perks
-github.com/ema/qdisc
+github.com/cespare/xxhash/v2
 github.com/go-kit/kit
 github.com/go-logfmt/logfmt
-github.com/hodgesds/perf-utils
-github.com/konsorten/go-windows-terminal-sequences
-github.com/kr/logfmt
+github.com/jpillora/backoff
 github.com/mattn/go-xmlrpc
-github.com/mdlayher/genetlink
-github.com/mdlayher/netlink
-github.com/mdlayher/wifi
-github.com/sirupsen/logrus
 github.com/soundcloud/go-runit
-github.com/stretchr/objx
-github.com/stretchr/testify
-go.uber.org/atomic
-go.uber.org/multierr
 gopkg.in/alecthomas/kingpin.v2
 
-======== License used by Dependencies
+-------- License used by Dependencies
 SPDX:MIT
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation files
@@ -1237,4 +989,4 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ATTRIBUTION-HELPER-GENERATED:
-License file based on go.mod with md5 sum: 009dd34e8b9fa2d8734344d9abef43c7
+License file based on go.mod with md5 sum: 9417b2644fe69fa032154176ce68a2fc
