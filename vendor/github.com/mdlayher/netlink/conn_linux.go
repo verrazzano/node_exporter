@@ -3,25 +3,26 @@
 package netlink
 
 import (
-	"errors"
+	"math"
 	"os"
 	"runtime"
-	"sync"
+	"sync/atomic"
 	"syscall"
+	"time"
 	"unsafe"
 
 	"golang.org/x/net/bpf"
 	"golang.org/x/sys/unix"
 )
 
-var (
-	errInvalidSockaddr = errors.New("expected unix.SockaddrNetlink but received different unix.Sockaddr")
-	errInvalidFamily   = errors.New("received invalid netlink family")
-)
-
 var _ Socket = &conn{}
 
+var _ deadlineSetter = &conn{}
+
 // A conn is the Linux implementation of a netlink sockets connection.
+//
+// All conn methods must wrap system call errors with os.NewSyscallError to
+// enable more intelligible error messages in OpError.
 type conn struct {
 	s  socket
 	sa *unix.SockaddrNetlink
@@ -32,13 +33,19 @@ type socket interface {
 	Bind(sa unix.Sockaddr) error
 	Close() error
 	FD() int
+	File() *os.File
 	Getsockname() (unix.Sockaddr, error)
 	Recvmsg(p, oob []byte, flags int) (n int, oobn int, recvflags int, from unix.Sockaddr, err error)
 	Sendmsg(p, oob []byte, to unix.Sockaddr, flags int) error
-	SetSockopt(level, name int, v unsafe.Pointer, l uint32) error
+	SetDeadline(t time.Time) error
+	SetReadDeadline(t time.Time) error
+	SetWriteDeadline(t time.Time) error
+	SetSockoptSockFprog(level, opt int, fprog *unix.SockFprog) error
+	SetSockoptInt(level, opt, value int) error
+	GetSockoptInt(level, opt int) (int, error)
 }
 
-// dial is the entry point for Dial.  dial opens a netlink socket using
+// dial is the entry point for Dial. dial opens a netlink socket using
 // system calls, and returns its PID.
 func dial(family int, config *Config) (*conn, uint32, error) {
 	// Prepare sysSocket's internal loop and create the socket.
@@ -50,13 +57,39 @@ func dial(family int, config *Config) (*conn, uint32, error) {
 		config = &Config{}
 	}
 
-	sock, err := newSysSocket(config)
-	if err != nil {
-		return nil, 0, err
+	// The caller has indicated it wants the netlink socket to be created
+	// inside another network namespace.
+	if config.NetNS != 0 {
+
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+
+		// Retrieve and store the calling OS thread's network namespace so
+		// the thread can be reassigned to it after creating a socket in another
+		// network namespace.
+		threadNS, err := threadNetNS()
+		if err != nil {
+			return nil, 0, err
+		}
+		// Always close the netns handle created above.
+		defer threadNS.Close()
+
+		// Assign the current OS thread the goroutine is locked to to the given
+		// network namespace.
+		if err := threadNS.Set(config.NetNS); err != nil {
+			return nil, 0, err
+		}
+
+		// Thread's namespace has been successfully set. Return the thread
+		// back to its original namespace after attempting to create the
+		// netlink socket.
+		defer threadNS.Restore()
 	}
 
+	// Socket will establish the internal state of the sysSocket structure.
+	sock := &sysSocket{}
 	if err := sock.Socket(family); err != nil {
-		return nil, 0, err
+		return nil, 0, os.NewSyscallError("socket", err)
 	}
 
 	return bind(sock, config)
@@ -79,13 +112,13 @@ func bind(s socket, config *Config) (*conn, uint32, error) {
 
 	if err := s.Bind(addr); err != nil {
 		_ = s.Close()
-		return nil, 0, err
+		return nil, 0, os.NewSyscallError("bind", err)
 	}
 
 	sa, err := s.Getsockname()
 	if err != nil {
 		_ = s.Close()
-		return nil, 0, err
+		return nil, 0, os.NewSyscallError("getsockname", err)
 	}
 
 	pid := sa.(*unix.SockaddrNetlink).Pid
@@ -112,7 +145,7 @@ func (c *conn) SendMessages(messages []Message) error {
 		Family: unix.AF_NETLINK,
 	}
 
-	return c.s.Sendmsg(buf, nil, addr, 0)
+	return os.NewSyscallError("sendmsg", c.s.Sendmsg(buf, nil, addr, 0))
 }
 
 // Send sends a single Message to netlink.
@@ -126,7 +159,7 @@ func (c *conn) Send(m Message) error {
 		Family: unix.AF_NETLINK,
 	}
 
-	return c.s.Sendmsg(b, nil, addr, 0)
+	return os.NewSyscallError("sendmsg", c.s.Sendmsg(b, nil, addr, 0))
 }
 
 // Receive receives one or more Messages from netlink.
@@ -139,7 +172,7 @@ func (c *conn) Receive() ([]Message, error) {
 		// when PacketInfo ConnOption is true.
 		n, _, _, _, err := c.s.Recvmsg(b, nil, unix.MSG_PEEK)
 		if err != nil {
-			return nil, err
+			return nil, os.NewSyscallError("recvmsg", err)
 		}
 
 		// Break when we can read all messages
@@ -152,17 +185,9 @@ func (c *conn) Receive() ([]Message, error) {
 	}
 
 	// Read out all available messages
-	n, _, _, from, err := c.s.Recvmsg(b, nil, 0)
+	n, _, _, _, err := c.s.Recvmsg(b, nil, 0)
 	if err != nil {
-		return nil, err
-	}
-
-	addr, ok := from.(*unix.SockaddrNetlink)
-	if !ok {
-		return nil, errInvalidSockaddr
-	}
-	if addr.Family != unix.AF_NETLINK {
-		return nil, errInvalidFamily
+		return nil, os.NewSyscallError("recvmsg", err)
 	}
 
 	n = nlmsgAlign(n)
@@ -187,7 +212,7 @@ func (c *conn) Receive() ([]Message, error) {
 
 // Close closes the connection.
 func (c *conn) Close() error {
-	return c.s.Close()
+	return os.NewSyscallError("close", c.s.Close())
 }
 
 // FD retrieves the file descriptor of the Conn.
@@ -195,52 +220,57 @@ func (c *conn) FD() int {
 	return c.s.FD()
 }
 
+// File retrieves the *os.File associated with the Conn.
+func (c *conn) File() *os.File {
+	return c.s.File()
+}
+
 // JoinGroup joins a multicast group by ID.
 func (c *conn) JoinGroup(group uint32) error {
-	return c.s.SetSockopt(
+	return os.NewSyscallError("setsockopt", c.s.SetSockoptInt(
 		unix.SOL_NETLINK,
 		unix.NETLINK_ADD_MEMBERSHIP,
-		unsafe.Pointer(&group),
-		uint32(unsafe.Sizeof(group)),
-	)
+		int(group),
+	))
 }
 
 // LeaveGroup leaves a multicast group by ID.
 func (c *conn) LeaveGroup(group uint32) error {
-	return c.s.SetSockopt(
+	return os.NewSyscallError("setsockopt", c.s.SetSockoptInt(
 		unix.SOL_NETLINK,
 		unix.NETLINK_DROP_MEMBERSHIP,
-		unsafe.Pointer(&group),
-		uint32(unsafe.Sizeof(group)),
-	)
+		int(group),
+	))
 }
 
 // SetBPF attaches an assembled BPF program to a conn.
 func (c *conn) SetBPF(filter []bpf.RawInstruction) error {
+	// We can't point to the first instruction in the array if no instructions
+	// are present.
+	if len(filter) == 0 {
+		return os.NewSyscallError("setsockopt", unix.EINVAL)
+	}
+
 	prog := unix.SockFprog{
 		Len:    uint16(len(filter)),
 		Filter: (*unix.SockFilter)(unsafe.Pointer(&filter[0])),
 	}
 
-	return c.s.SetSockopt(
+	return os.NewSyscallError("setsockopt", c.s.SetSockoptSockFprog(
 		unix.SOL_SOCKET,
 		unix.SO_ATTACH_FILTER,
-		unsafe.Pointer(&prog),
-		uint32(unsafe.Sizeof(prog)),
-	)
+		&prog,
+	))
 }
 
 // RemoveBPF removes a BPF filter from a conn.
 func (c *conn) RemoveBPF() error {
-	// dummy is ignored as argument to SO_DETACH_FILTER
-	// but SetSockopt requires it as an argument
-	var dummy uint32
-	return c.s.SetSockopt(
+	// 0 argument is ignored by SO_DETACH_FILTER.
+	return os.NewSyscallError("setsockopt", c.s.SetSockoptInt(
 		unix.SOL_SOCKET,
 		unix.SO_DETACH_FILTER,
-		unsafe.Pointer(&dummy),
-		uint32(unsafe.Sizeof(dummy)),
-	)
+		0,
+	))
 }
 
 // SetOption enables or disables a netlink socket option for the Conn.
@@ -248,46 +278,97 @@ func (c *conn) SetOption(option ConnOption, enable bool) error {
 	o, ok := linuxOption(option)
 	if !ok {
 		// Return the typical Linux error for an unknown ConnOption.
-		return unix.ENOPROTOOPT
+		return os.NewSyscallError("setsockopt", unix.ENOPROTOOPT)
 	}
 
-	var v uint32
+	var v int
 	if enable {
 		v = 1
 	}
 
-	return c.s.SetSockopt(
+	return os.NewSyscallError("setsockopt", c.s.SetSockoptInt(
 		unix.SOL_NETLINK,
 		o,
-		unsafe.Pointer(&v),
-		uint32(unsafe.Sizeof(v)),
-	)
+		v,
+	))
+}
+
+func (c *conn) SetDeadline(t time.Time) error {
+	return c.s.SetDeadline(t)
+}
+
+func (c *conn) SetReadDeadline(t time.Time) error {
+	return c.s.SetReadDeadline(t)
+}
+
+func (c *conn) SetWriteDeadline(t time.Time) error {
+	return c.s.SetWriteDeadline(t)
 }
 
 // SetReadBuffer sets the size of the operating system's receive buffer
 // associated with the Conn.
 func (c *conn) SetReadBuffer(bytes int) error {
-	v := uint32(bytes)
-
-	return c.s.SetSockopt(
+	// First try SO_RCVBUFFORCE. Given necessary permissions this syscall ignores limits.
+	err := os.NewSyscallError("setsockopt", c.s.SetSockoptInt(
 		unix.SOL_SOCKET,
-		unix.SO_RCVBUF,
-		unsafe.Pointer(&v),
-		uint32(unsafe.Sizeof(v)),
-	)
+		unix.SO_RCVBUFFORCE,
+		bytes,
+	))
+	if err != nil {
+		// If SO_SNDBUFFORCE fails, try SO_RCVBUF
+		err = os.NewSyscallError("setsockopt", c.s.SetSockoptInt(
+			unix.SOL_SOCKET,
+			unix.SO_RCVBUF,
+			bytes,
+		))
+	}
+	return err
 }
 
 // SetReadBuffer sets the size of the operating system's transmit buffer
 // associated with the Conn.
 func (c *conn) SetWriteBuffer(bytes int) error {
-	v := uint32(bytes)
+	// First try SO_SNDBUFFORCE. Given necessary permissions this syscall ignores limits.
+	err := os.NewSyscallError("setsockopt", c.s.SetSockoptInt(
+		unix.SOL_SOCKET,
+		unix.SO_SNDBUFFORCE,
+		bytes,
+	))
+	if err != nil {
+		// If SO_SNDBUFFORCE fails, try SO_SNDBUF
+		err = os.NewSyscallError("setsockopt", c.s.SetSockoptInt(
+			unix.SOL_SOCKET,
+			unix.SO_SNDBUF,
+			bytes,
+		))
+	}
+	return err
+}
 
-	return c.s.SetSockopt(
+// GetReadBuffer retrieves the size of the operating system's receive buffer
+// associated with the Conn.
+func (c *conn) GetReadBuffer() (int, error) {
+	value, err := c.s.GetSockoptInt(
+		unix.SOL_SOCKET,
+		unix.SO_RCVBUF,
+	)
+	if err != nil {
+		return 0, os.NewSyscallError("getsockopt", err)
+	}
+	return value, nil
+}
+
+// GetWriteBuffer retrieves the size of the operating system's transmit buffer
+// associated with the Conn.
+func (c *conn) GetWriteBuffer() (int, error) {
+	value, err := c.s.GetSockoptInt(
 		unix.SOL_SOCKET,
 		unix.SO_SNDBUF,
-		unsafe.Pointer(&v),
-		uint32(unsafe.Sizeof(v)),
 	)
+	if err != nil {
+		return 0, os.NewSyscallError("getsockopt", err)
+	}
+	return value, nil
 }
 
 // linuxOption converts a ConnOption to its Linux value.
@@ -303,6 +384,8 @@ func linuxOption(o ConnOption) (int, bool) {
 		return unix.NETLINK_LISTEN_ALL_NSID, true
 	case CapAcknowledge:
 		return unix.NETLINK_CAP_ACK, true
+	case ExtendedAcknowledge:
+		return unix.NETLINK_EXT_ACK, true
 	default:
 		return 0, false
 	}
@@ -325,150 +408,102 @@ var _ socket = &sysSocket{}
 
 // A sysSocket is a socket which uses system calls for socket operations.
 type sysSocket struct {
-	fd int
+	// Atomics must come first.
+	closed uint32
 
-	wg    *sync.WaitGroup
-	funcC chan<- func()
-
-	mu sync.RWMutex
-
-	done  bool
-	doneC chan<- bool
+	// Established when calling Socket.
+	fd *os.File
+	rc syscall.RawConn
 }
 
-// newSysSocket creates a sysSocket that optionally locks its internal goroutine
-// to a single thread.
-func newSysSocket(config *Config) (*sysSocket, error) {
-	var wg sync.WaitGroup
-	wg.Add(1)
-
-	// This system call loop strategy was inspired by:
-	// https://github.com/golang/go/wiki/LockOSThread.  Thanks to squeed on
-	// Gophers Slack for providing this useful link.
-
-	funcC := make(chan func())
-	doneC := make(chan bool)
-	errC := make(chan error)
-
-	go func() {
-		// It is important to lock this goroutine to its OS thread for the duration
-		// of the netlink socket being used, or else the kernel may end up routing
-		// messages to the wrong places.
-		// See: http://lists.infradead.org/pipermail/libnl/2017-February/002293.html.
-		//
-		// The intent is to never unlock the OS thread, so that the thread
-		// will terminate when the goroutine exits starting in Go 1.10:
-		// https://go-review.googlesource.com/c/go/+/46038.
-		//
-		// However, due to recent instability and a potential bad interaction
-		// with the Go runtime for threads which are not unlocked, we have
-		// elected to temporarily unlock the thread when the goroutine terminates:
-		// https://github.com/golang/go/issues/25128#issuecomment-410764489.
-
-		runtime.LockOSThread()
-		defer runtime.UnlockOSThread()
-		defer wg.Done()
-
-		// The user requested the Conn to operate in a non-default network namespace.
-		if config.NetNS != 0 {
-
-			// Get the current namespace of the thread the goroutine is locked to.
-			origNetNS, err := getThreadNetNS()
-			if err != nil {
-				errC <- err
-				return
-			}
-
-			// Set the network namespace of the current thread using
-			// the file descriptor provided by the user.
-			err = setThreadNetNS(config.NetNS)
-			if err != nil {
-				errC <- err
-				return
-			}
-
-			// Once the thread's namespace has been successfully manipulated,
-			// make sure we change it back when the goroutine returns.
-			defer setThreadNetNS(origNetNS)
-		}
-
-		// Signal to caller that initialization was successful.
-		errC <- nil
-
-		for {
-			select {
-			case <-doneC:
-				return
-			case f := <-funcC:
-				f()
-			}
-		}
-	}()
-
-	// Wait for the goroutine to return err or nil.
-	if err := <-errC; err != nil {
-		return nil, err
-	}
-
-	return &sysSocket{
-		wg:    &wg,
-		funcC: funcC,
-		doneC: doneC,
-	}, nil
-}
-
-// do runs f in a worker goroutine which can be locked to one thread.
-func (s *sysSocket) do(f func()) error {
-	done := make(chan bool, 1)
-
-	// All operations handled by this function are assumed to only
-	// read from s.done.
-	s.mu.RLock()
-
-	if s.done {
-		s.mu.RUnlock()
+// read executes f, a read function, against the associated file descriptor.
+func (s *sysSocket) read(f func(fd int) bool) error {
+	if atomic.LoadUint32(&s.closed) != 0 {
 		return syscall.EBADF
 	}
 
-	s.funcC <- func() {
-		f()
-		done <- true
+	return s.rc.Read(func(sysfd uintptr) bool {
+		return f(int(sysfd))
+	})
+}
+
+// write executes f, a write function, against the associated file descriptor.
+func (s *sysSocket) write(f func(fd int) bool) error {
+	if atomic.LoadUint32(&s.closed) != 0 {
+		return syscall.EBADF
 	}
-	<-done
 
-	s.mu.RUnlock()
+	return s.rc.Write(func(sysfd uintptr) bool {
+		return f(int(sysfd))
+	})
+}
 
-	return nil
+// control executes f, a control function, against the associated file descriptor.
+func (s *sysSocket) control(f func(fd int)) error {
+	if atomic.LoadUint32(&s.closed) != 0 {
+		return syscall.EBADF
+	}
+
+	return s.rc.Control(func(sysfd uintptr) {
+		f(int(sysfd))
+	})
 }
 
 func (s *sysSocket) Socket(family int) error {
-	var (
-		fd  int
-		err error
+	// Mirror what the standard library does when creating file
+	// descriptors: avoid racing a fork/exec with the creation
+	// of new file descriptors, so that child processes do not
+	// inherit netlink socket file descriptors unexpectedly.
+	//
+	// On Linux, SOCK_CLOEXEC was introduced in 2.6.27. OTOH,
+	// Go supports Linux 2.6.23 and above. If we get EINVAL on
+	// the first try, it may be that we are running on a kernel
+	// older than 2.6.27. In that case, take syscall.ForkLock
+	// and try again without SOCK_CLOEXEC.
+	//
+	// For a more thorough explanation, see similar work in the
+	// Go tree: func sysSocket in net/sock_cloexec.go, as well
+	// as the detailed comment in syscall/exec_unix.go.
+	fd, err := unix.Socket(
+		unix.AF_NETLINK,
+		unix.SOCK_RAW|unix.SOCK_NONBLOCK|unix.SOCK_CLOEXEC,
+		family,
 	)
-
-	doErr := s.do(func() {
+	if err == unix.EINVAL {
+		syscall.ForkLock.RLock()
 		fd, err = unix.Socket(
 			unix.AF_NETLINK,
 			unix.SOCK_RAW,
 			family,
 		)
-	})
-	if doErr != nil {
-		return doErr
+		if err == nil {
+			unix.CloseOnExec(fd)
+		}
+		syscall.ForkLock.RUnlock()
+
+		if err := unix.SetNonblock(fd, true); err != nil {
+			return err
+		}
 	}
+
+	// os.NewFile registers the file descriptor with the runtime poller, which
+	// is then used for most subsequent operations except those that require
+	// raw I/O via SyscallConn.
+	//
+	// See also: https://golang.org/pkg/os/#NewFile
+	s.fd = os.NewFile(uintptr(fd), "netlink")
+	s.rc, err = s.fd.SyscallConn()
 	if err != nil {
 		return err
 	}
 
-	s.fd = fd
 	return nil
 }
 
 func (s *sysSocket) Bind(sa unix.Sockaddr) error {
 	var err error
-	doErr := s.do(func() {
-		err = unix.Bind(s.fd, sa)
+	doErr := s.control(func(fd int) {
+		err = unix.Bind(fd, sa)
 	})
 	if doErr != nil {
 		return doErr
@@ -478,29 +513,23 @@ func (s *sysSocket) Bind(sa unix.Sockaddr) error {
 }
 
 func (s *sysSocket) Close() error {
+	// The caller has expressed an intent to close the socket, so immediately
+	// increment s.closed to force further calls to result in EBADF before also
+	// closing the file descriptor to unblock any outstanding operations.
+	//
+	// Because other operations simply check for s.closed != 0, we will permit
+	// double Close, which would increment s.closed beyond 1.
+	if atomic.AddUint32(&s.closed, 1) != 1 {
+		// Multiple Close calls.
+		return nil
+	}
 
-	// Be sure to acquire a write lock because we need to stop any other
-	// goroutines from sending system call requests after close.
-	// Any invocation of do() after this write lock unlocks is guaranteed
-	// to find s.done being true.
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	// Close the socket from the main thread, this operation has no risk
-	// of routing data to the wrong socket.
-	err := unix.Close(s.fd)
-	s.done = true
-
-	// Signal the syscall worker to exit, wait for the WaitGroup to join,
-	// and close the job channel only when the worker is guaranteed to have stopped.
-	close(s.doneC)
-	s.wg.Wait()
-	close(s.funcC)
-
-	return err
+	return s.fd.Close()
 }
 
-func (s *sysSocket) FD() int { return s.fd }
+func (s *sysSocket) FD() int { return int(s.fd.Fd()) }
+
+func (s *sysSocket) File() *os.File { return s.fd }
 
 func (s *sysSocket) Getsockname() (unix.Sockaddr, error) {
 	var (
@@ -508,8 +537,8 @@ func (s *sysSocket) Getsockname() (unix.Sockaddr, error) {
 		err error
 	)
 
-	doErr := s.do(func() {
-		sa, err = unix.Getsockname(s.fd)
+	doErr := s.control(func(fd int) {
+		sa, err = unix.Getsockname(fd)
 	})
 	if doErr != nil {
 		return nil, doErr
@@ -525,8 +554,11 @@ func (s *sysSocket) Recvmsg(p, oob []byte, flags int) (int, int, int, unix.Socka
 		err                error
 	)
 
-	doErr := s.do(func() {
-		n, oobn, recvflags, from, err = unix.Recvmsg(s.fd, p, oob, flags)
+	doErr := s.read(func(fd int) bool {
+		n, oobn, recvflags, from, err = unix.Recvmsg(fd, p, oob, flags)
+
+		// Check for readiness.
+		return ready(err)
 	})
 	if doErr != nil {
 		return 0, 0, 0, nil, doErr
@@ -537,8 +569,11 @@ func (s *sysSocket) Recvmsg(p, oob []byte, flags int) (int, int, int, unix.Socka
 
 func (s *sysSocket) Sendmsg(p, oob []byte, to unix.Sockaddr, flags int) error {
 	var err error
-	doErr := s.do(func() {
-		err = unix.Sendmsg(s.fd, p, oob, to, flags)
+	doErr := s.write(func(fd int) bool {
+		err = unix.Sendmsg(fd, p, oob, to, flags)
+
+		// Check for readiness.
+		return ready(err)
 	})
 	if doErr != nil {
 		return doErr
@@ -547,14 +582,80 @@ func (s *sysSocket) Sendmsg(p, oob []byte, to unix.Sockaddr, flags int) error {
 	return err
 }
 
-func (s *sysSocket) SetSockopt(level, name int, v unsafe.Pointer, l uint32) error {
+func (s *sysSocket) SetDeadline(t time.Time) error {
+	return s.fd.SetDeadline(t)
+}
+
+func (s *sysSocket) SetReadDeadline(t time.Time) error {
+	return s.fd.SetReadDeadline(t)
+}
+
+func (s *sysSocket) SetWriteDeadline(t time.Time) error {
+	return s.fd.SetWriteDeadline(t)
+}
+
+func (s *sysSocket) SetSockoptInt(level, opt, value int) error {
+	// Value must be in range of a C integer.
+	if value < math.MinInt32 || value > math.MaxInt32 {
+		return unix.EINVAL
+	}
+
 	var err error
-	doErr := s.do(func() {
-		err = setsockopt(s.fd, level, name, v, l)
+	doErr := s.control(func(fd int) {
+		err = unix.SetsockoptInt(fd, level, opt, value)
 	})
 	if doErr != nil {
 		return doErr
 	}
 
 	return err
+}
+
+func (s *sysSocket) GetSockoptInt(level, opt int) (int, error) {
+	var (
+		value int
+		err   error
+	)
+	doErr := s.control(func(fd int) {
+		value, err = unix.GetsockoptInt(fd, level, opt)
+	})
+	if doErr != nil {
+		return 0, doErr
+	}
+
+	return value, err
+}
+
+func (s *sysSocket) SetSockoptSockFprog(level, opt int, fprog *unix.SockFprog) error {
+	var err error
+	doErr := s.control(func(fd int) {
+		err = unix.SetsockoptSockFprog(fd, level, opt, fprog)
+	})
+	if doErr != nil {
+		return doErr
+	}
+
+	return err
+}
+
+// ready indicates readiness based on the value of err.
+func ready(err error) bool {
+	// When a socket is in non-blocking mode, we might see
+	// EAGAIN. In that case, return false to let the poller wait for readiness.
+	// See the source code for internal/poll.FD.RawRead for more details.
+	//
+	// Starting in Go 1.14, goroutines are asynchronously preemptible. The 1.14
+	// release notes indicate that applications should expect to see EINTR more
+	// often on slow system calls (like recvmsg while waiting for input), so
+	// we must handle that case as well.
+	//
+	// If the socket is in blocking mode, EAGAIN should never occur.
+	switch err {
+	case syscall.EAGAIN, syscall.EINTR:
+		// Not ready.
+		return false
+	default:
+		// Ready whether there was error or no error.
+		return true
+	}
 }

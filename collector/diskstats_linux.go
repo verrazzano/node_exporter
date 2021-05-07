@@ -24,8 +24,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/common/log"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -54,6 +55,7 @@ func (d *typedFactorDesc) mustNewConstMetric(value float64, labels ...string) pr
 type diskstatsCollector struct {
 	ignoredDevicesPattern *regexp.Regexp
 	descs                 []typedFactorDesc
+	logger                log.Logger
 }
 
 func init() {
@@ -62,7 +64,7 @@ func init() {
 
 // NewDiskstatsCollector returns a new Collector exposing disk device stats.
 // Docs from https://www.kernel.org/doc/Documentation/iostats.txt
-func NewDiskstatsCollector() (Collector, error) {
+func NewDiskstatsCollector(logger log.Logger) (Collector, error) {
 	var diskLabelNames = []string{"device"}
 
 	return &diskstatsCollector{
@@ -160,19 +162,37 @@ func NewDiskstatsCollector() (Collector, error) {
 				), valueType: prometheus.CounterValue,
 				factor: .001,
 			},
+			{
+				desc: prometheus.NewDesc(
+					prometheus.BuildFQName(namespace, diskSubsystem, "flush_requests_total"),
+					"The total number of flush requests completed successfully",
+					diskLabelNames,
+					nil,
+				), valueType: prometheus.CounterValue,
+			},
+			{
+				desc: prometheus.NewDesc(
+					prometheus.BuildFQName(namespace, diskSubsystem, "flush_requests_time_seconds_total"),
+					"This is the total number of seconds spent by all flush requests.",
+					diskLabelNames,
+					nil,
+				), valueType: prometheus.CounterValue,
+				factor: .001,
+			},
 		},
+		logger: logger,
 	}, nil
 }
 
 func (c *diskstatsCollector) Update(ch chan<- prometheus.Metric) error {
 	diskStats, err := getDiskStats()
 	if err != nil {
-		return fmt.Errorf("couldn't get diskstats: %s", err)
+		return fmt.Errorf("couldn't get diskstats: %w", err)
 	}
 
 	for dev, stats := range diskStats {
 		if c.ignoredDevicesPattern.MatchString(dev) {
-			log.Debugf("Ignoring device: %s", dev)
+			level.Debug(c.logger).Log("msg", "Ignoring device", "device", dev)
 			continue
 		}
 
@@ -183,7 +203,7 @@ func (c *diskstatsCollector) Update(ch chan<- prometheus.Metric) error {
 			}
 			v, err := strconv.ParseFloat(value, 64)
 			if err != nil {
-				return fmt.Errorf("invalid value %s in diskstats: %s", value, err)
+				return fmt.Errorf("invalid value %s in diskstats: %w", value, err)
 			}
 			ch <- c.descs[i].mustNewConstMetric(v, dev)
 		}
