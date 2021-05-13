@@ -1,0 +1,54 @@
+# Copyright (C) 2020, 2021, Oracle and/or its affiliates.
+# Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
+
+FROM container-registry.oracle.com/os/oraclelinux:7-slim@sha256:fcc6f54bb01fc83319990bf5fa1b79f1dec93cbb87db3c5a8884a5a44148e7bb AS build_base
+
+LABEL maintainer = "Verrazzano developers <verrazzano_ww@oracle.com>"
+ENV GOBIN=/usr/bin
+ENV GOPATH=/go
+RUN set -eux; \
+    yum update -y ; \
+    yum-config-manager --save --setopt=ol7_ociyum_config.skip_if_unavailable=true ; \
+    yum install -y oracle-golang-release-el7 ; \
+    yum-config-manager --add-repo http://yum.oracle.com/repo/OracleLinux/OL7/developer/golang115/x86_64 ; \
+	yum install -y \
+        git \
+        gcc \
+        make \
+        golang-1.15.7-1.el7 \
+	; \
+    yum clean all ; \
+    go version ; \
+	rm -rf /var/cache/yum
+
+# Need to use specific WORKDIR to match node_exporter's source packages
+WORKDIR /go/src/github.com/prometheus/node_exporter
+
+# Make sure modules are enabled
+ENV GO111MODULE=on
+
+# Fetch all the dependencies
+COPY go.mod .
+COPY go.sum .
+#RUN go clean -modcache
+RUN go mod download
+
+FROM build_base AS server_builder
+COPY . .
+RUN go install -a node_exporter.go
+
+
+FROM container-registry.oracle.com/os/oraclelinux:7-slim@sha256:fcc6f54bb01fc83319990bf5fa1b79f1dec93cbb87db3c5a8884a5a44148e7bb AS node_exporter
+RUN yum update -y \
+    && yum-config-manager --save --setopt=ol7_ociyum_config.skip_if_unavailable=true \
+    && yum update -y python glibc  curl openssl \
+    && yum clean all \
+    && rm -rf /var/cache/yum
+COPY --from=server_builder /usr/bin/node_exporter /bin/node_exporter
+
+# Add license files to the image 
+COPY LICENSE README.md THIRD_PARTY_LICENSES.txt /license/
+
+EXPOSE 9100
+USER nobody
+ENTRYPOINT ["/bin/node_exporter"]
