@@ -34,7 +34,3 @@ dependencies-stamp
 
 # Test files extracted from ttar
 collector/fixtures/sys/
-
-known_licenses.txt
-no_licenses.txt
-thirdparty_licenses
